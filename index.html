@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>GifTastic</title>
+	<style type="text/css">
+		button,
+		div,
+		form,
+		input {
+			margin: 10px;
+		}
+	</style>	
+</head>
+<body>
+
+	<div class="container">
+	    <h1>Animal Search</h1>
+
+	    <!-- ID for Animals -->
+	    <div id="animals-view"></div>
+
+	    <!-- Buttons Rendered  -->
+	    <div id="buttons-view"></div>
+
+	    <form id="animal-form">
+	      <label for="animal-input">Add an animal</label>
+	      <input type="text" id="animal-input"><br>
+
+	      <!-- Button triggers new animal to be added -->
+	      <input id="add-animal" type="submit" value="Add an animal">
+	    </form>
+
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	    <script type="text/javascript">
+	    	// Array of animals
+	    	var animals = ["cat", "dog", "fish"];
+
+	    	//displayAnimalInfo function re-renders the HTML to display the appropriate content
+	    	function displayAnimalInfo() {
+	    		var animal = $(this).attr("data-name");
+	    		var queryURL = "http://api.giphy.com/v1/gifs/search?q=" + animal + "&api_key=dc6zaTOxFJmzC";
+
+	    		// create AJAX call for specific animal button clicked
+	    		$.ajax({
+	    			url: queryURL,
+	    			method: "GET"
+	    		}).done(function(response) {
+
+	    			//create div to hold the animal
+	    			var animalDiv = $("<div class='animal'>");
+
+	    			//store the rating data
+	    			var rating = response.Rated;
+
+	    			//create element to have the rating displayed
+	    			var pOne = $("<p>").text("Rating: " + rating);
+
+	    			//display the rating
+	    			animalDiv.append(pOne);
+
+	    			//retrieve the URL for the image
+	    			var imgURL = response.Poster;
+
+	    			//create element to hold the image
+	    			var image = $("<img>").attr("src", imgURL);
+
+	    			//appending the image
+	    			animalDiv.append(image);
+
+	    			//putting the entire animal above the previous
+	    			$("#animals-view").prepend(animalDiv);	
+	    		});
+	    	}
+
+	    	// create function for displaying animal data
+	    	function renderButtons() {
+
+	    		//delete the animals prior to adding new animals
+	    		$("#buttons-view").empty();
+
+	    		//for-loop through array of animals
+	    		for (var i = 0; i < animals.length; i++) {
+	    			//dynamically generate buttons for each animal
+	    			var a = $("<button>");
+	    			a.addClass("animal");
+	    			a.attr("animal-name", animals[i]);
+	    			a.text(animals[i]);
+	    			$("#buttons-view").append(a);
+	    		}
+	    	}
+
+	    	//function to handle events where animal button is clicked
+	    	$("#add-animal").on("click", function(event) {
+	    		event.preventDefault();
+	    		//grabs the input from the textbox & clears whitespace
+	    		var animal = $("#animal-input").val().trim();
+
+	    		//add animal from textbox to the array
+	    		animals.push(animal);
+
+	    		//call renderButtons which processes the animal array
+	    		renderButtons();
+	    	});
+
+	    	//add click event listener to all elements with class 'animal'
+	    	$(document).on("click", ".animal", displayAnimalInfo);
+
+	    	//calling the renderButtons function to display initial buttons
+	    	renderButtons();
+    	</script>
+    </div>	
+</body>
+</html>
